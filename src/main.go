@@ -9,8 +9,8 @@
 package main
 
 import (
-	"io/ioutil"
 	"encoding/json"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"runtime"
@@ -18,10 +18,10 @@ import (
 	"time"
 )
 import (
-	"utils"
 	"controller"
 	"rpc_framework"
 	"ublog"
+	"utils"
 )
 
 func loadSysConfigs(file string) error {
@@ -95,25 +95,25 @@ func main() {
 
 	runtime.GOMAXPROCS(configs.ProcessNum)
 
-    //4 开启TCP服务
-    router := &controller.Router{}
-    tcpServer := rpc_framework.TcpServer{
-        ListenAddress:      configs.ListenAddressTcp,
-        IdleTimeout:        configs.IdleTimeout,
-        Logger:             logger,
-        TerminateSignal:    false,
-        Router:             router,
-    }
-    go func() {
-        tcpServer.Start()
-    }()
+	//4 开启TCP服务
+	router := &controller.Router{}
+	tcpServer := rpc_framework.TcpServer{
+		ListenAddress:   configs.ListenAddressTcp,
+		IdleTimeout:     configs.IdleTimeout,
+		Logger:          logger,
+		TerminateSignal: false,
+		Router:          router,
+	}
+	go func() {
+		tcpServer.Start()
+	}()
 	logger.UbLogNotice("start tcp service at %s OK", configs.ListenAddressTcp)
 
 	//5 响应退出信号
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	<-signalChan
-    
-    tcpServer.TerminateSignal = true
+
+	tcpServer.TerminateSignal = true
 	logger.UbLogNotice("service exist!")
 }

@@ -178,4 +178,3 @@ func Md5(str string) string {
 	rs := hex.EncodeToString(ctx.Sum(nil))
 	return rs
 }
-

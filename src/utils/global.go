@@ -11,11 +11,11 @@ package utils
 import (
 	"database/sql"
 	"fmt"
-    "strings"
 	_ "github.com/go-sql-driver/mysql"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/redis.v3"
-    "gopkg.in/mgo.v2"
 	"math/rand"
+	"strings"
 	"time"
 	"ublog"
 )
@@ -25,17 +25,17 @@ type RedisHandle []*redis.Client
 type MysqlHandle []*sql.DB
 
 type GlobalStruct struct {
-	Config       ConfigStruct
-	Logger       *ublog.UbLog
-	MysqlHandles MysqlHandle
-	RedisHandles RedisHandle
-    MsgMongoSession *mgo.Session
+	Config          ConfigStruct
+	Logger          *ublog.UbLog
+	MysqlHandles    MysqlHandle
+	RedisHandles    RedisHandle
+	MsgMongoSession *mgo.Session
 }
 
 type ConfigStruct struct {
-	ListenAddressHttp   string
-	ListenAddressTcp    string
-	ProcessNum          int
+	ListenAddressHttp string
+	ListenAddressTcp  string
+	ProcessNum        int
 
 	//log options
 	LogDir            string `flag:"log-path"`
@@ -77,7 +77,7 @@ type ConfigStruct struct {
 type Err struct {
 	ErrorCode int64  `json:"error_code"`
 	ErrorMsg  string `json:"error_msg"`
-	RequestId uint32  `json:"request_id"`
+	RequestId uint32 `json:"request_id"`
 	RoomId    int64  `json:"room_id,omitempty"`
 }
 
@@ -186,16 +186,16 @@ func (handle *MysqlHandle) Init() error {
 }
 
 func MongoInit() error {
-    config := Global.Config
-		hostList := strings.Join(config.MsgMongoDBAddresses, ",")
-		session, err := mgo.DialWithTimeout(hostList, time.Duration(config.MongoDBConnTimeout)*time.Second)
-		if err != nil {
-			Global.Logger.UbLogFatal("failed to dail mongodb - address:%v err:%s", config.MsgMongoDBAddresses, err)
-			return err
-		}
-		Global.Logger.UbLogNotice("msgmongodb - address:%s", config.MsgMongoDBAddresses)
-		session.SetMode(mgo.Monotonic, true)
-		session.SetPoolLimit(config.MongoDBPoolLimit)
-		Global.MsgMongoSession = session
-        return nil
+	config := Global.Config
+	hostList := strings.Join(config.MsgMongoDBAddresses, ",")
+	session, err := mgo.DialWithTimeout(hostList, time.Duration(config.MongoDBConnTimeout)*time.Second)
+	if err != nil {
+		Global.Logger.UbLogFatal("failed to dail mongodb - address:%v err:%s", config.MsgMongoDBAddresses, err)
+		return err
+	}
+	Global.Logger.UbLogNotice("msgmongodb - address:%s", config.MsgMongoDBAddresses)
+	session.SetMode(mgo.Monotonic, true)
+	session.SetPoolLimit(config.MongoDBPoolLimit)
+	Global.MsgMongoSession = session
+	return nil
 }
